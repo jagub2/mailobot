@@ -25,9 +25,9 @@ class Checker:
 
     def connect(self):
         self.server = imapclient.IMAPClient(self.server_address, ssl_context=ssl_context if self.use_ssl else None)
-        self.server.login(self.username, keyring.get_password("MailChecker-{}".format(self.short_name), self.username))
+        self.server.login(self.username, keyring.get_password(f"MailChecker-{self.short_name}", self.username))
         self.server.select_folder('inbox')
-        print("Connected to mailbox {}".format(self.short_name))
+        print(f"Connected to mailbox {self.short_name}")
 
     def timestamps_difference(self, timestamp):
         delta = timestamp - self.last_sync
@@ -37,7 +37,7 @@ class Checker:
         new_messages = 0
         new_messages += len(self.server.search(['UNSEEN']))
         if new_messages > 0:
-            self.message_queue.put("{}: unread messages: {}".format(self.short_name, new_messages))
+            self.message_queue.put(f"{self.short_name}: unread messages: {new_messages}")
 
     def idle_loop(self):
         self.server.idle()
