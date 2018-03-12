@@ -1,3 +1,6 @@
 IMAPClient==2.0.0
 keyring==11.0.0
+keyrings.alt==3.0.0
+pycryptodome==3.5.1
 python-telegram-bot==10.0.1
+pyzmq==17.0.0

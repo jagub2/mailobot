@@ -7,6 +7,7 @@ import threading
 import keyring
 import imapclient
 import imapclient.exceptions
+from encrypted_env_keyring import EncryptedEnvKeyring
 
 
 class Checker:
@@ -25,6 +26,7 @@ class Checker:
         self.keep_running = True
 
     def connect(self):
+        keyring.set_keyring(EncryptedEnvKeyring())
         self.server = imapclient.IMAPClient(self.server_address, ssl_context=self.ssl_context)
         self.server.login(self.username, keyring.get_password(f"MailChecker-{self.short_name}", self.username))
         self.server.select_folder('inbox')
