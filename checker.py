@@ -1,13 +1,12 @@
+# pylint: disable=C0111,C0301
 import datetime
-import imapclient
-import imapclient.exceptions
-import keyring
 import queue
 import socket
 import ssl
 import threading
-
-ssl_context = ssl.create_default_context()
+import keyring
+import imapclient
+import imapclient.exceptions
 
 
 class Checker:
@@ -19,12 +18,14 @@ class Checker:
         self.timeout = timeout
         self.server_address = server_address
         self.username = username
-        self.use_ssl = use_ssl
+        self.ssl_context = None
+        if use_ssl:
+            self.ssl_context = ssl.create_default_context()
         self.last_sync = datetime.datetime.now()
         self.keep_running = True
 
     def connect(self):
-        self.server = imapclient.IMAPClient(self.server_address, ssl_context=ssl_context if self.use_ssl else None)
+        self.server = imapclient.IMAPClient(self.server_address, ssl_context=self.ssl_context)
         self.server.login(self.username, keyring.get_password(f"MailChecker-{self.short_name}", self.username))
         self.server.select_folder('inbox')
         print(f"Connected to mailbox {self.short_name}")

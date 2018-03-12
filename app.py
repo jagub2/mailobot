@@ -1,20 +1,13 @@
-from checker import Checker, CheckerThread
-from queue import Queue
-from telegram_bot import TelegramBot, TelegramThread
+# pylint: disable=C0111,C0301
 import configparser
 import os
 import time
+from queue import Queue
+from checker import Checker, CheckerThread
+from telegram_bot import TelegramBot, TelegramThread
 
-"""
-import logging
 
-logging.basicConfig(
-    format='%(asctime)s - %(levelname)s: %(message)s',
-    level=logging.DEBUG
-)
-"""
-
-if __name__ == "__main__":
+def main():
     message_queue = Queue()
     config = configparser.ConfigParser()
     config.read(os.path.join(os.path.dirname(__file__), 'config.ini'))
@@ -29,3 +22,7 @@ if __name__ == "__main__":
 
     while True:
         time.sleep(1)
+
+
+if __name__ == "__main__":
+    main()

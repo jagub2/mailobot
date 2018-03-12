@@ -1,9 +1,10 @@
-from telegram.error import TelegramError, TimedOut, NetworkError
-from telegram.ext import CommandHandler, Updater, messagequeue
+# pylint: disable=C0111
 import queue
-import telegram.bot
 import time
 import threading
+from telegram.error import TelegramError, TimedOut, NetworkError
+from telegram.ext import CommandHandler, Updater, messagequeue
+import telegram.bot
 
 
 # https://github.com/python-telegram-bot/python-telegram-bot/wiki/Avoiding-flood-limits
