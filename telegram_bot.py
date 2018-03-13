@@ -44,8 +44,9 @@ class TelegramBot:
     def connect(self):
         self.zmq_context = zmq.Context()
         self.zmq_socket = self.zmq_context.socket(zmq.SUB)
-        self.zmq_socket.setsockopt_string(zmq.SUBSCRIBE, "")
+        self.zmq_socket.setsockopt_string(zmq.SUBSCRIBE, "unread messages:")
         self.zmq_socket.bind(f"tcp://127.0.0.1:{self.zmq_port}")
+        print(f"Bound ZMQ connection at port {self.zmq_port}")
 
         self.message_queue = messagequeue.MessageQueue(all_burst_limit=3, all_time_limit_ms=3000)
         self.bot = MQBot(token=self.api_key, mqueue=self.message_queue)
@@ -59,9 +60,10 @@ class TelegramBot:
         while self.keep_running:
             time.sleep(0.1)
             try:
-                data = self.zmq_socket.recv()
+                data = self.zmq_socket.recv_string()
                 self.dispatcher.bot.send_message(chat_id=self.master, text=data)
-            except (TimedOut, NetworkError, TelegramError, zmq.ZMQError):
+            except (TimedOut, NetworkError, TelegramError, zmq.ZMQError) as e:
+                print(f"Bot: Got exception: {e}")
                 self.zmq_socket.close()
                 self.connect()
                 self.queue_loop()

@@ -30,6 +30,7 @@ class Checker:
         self.zmq_socket = self.zmq_context.socket(zmq.PUB)
         self.zmq_socket.connect(f"tcp://127.0.0.1:{self.zmq_port}")
         time.sleep(0.1)
+        print("Established ZMQ connection")
 
         keyring.set_keyring(EncryptedEnvKeyring())
         self.server = imapclient.IMAPClient(self.server_address, ssl_context=self.ssl_context)
@@ -45,7 +46,8 @@ class Checker:
         new_messages = 0
         new_messages += len(self.server.search(['UNSEEN']))
         if new_messages > 0:
-            self.zmq_socket.send_string(f"{self.short_name}: unread messages: {new_messages}")
+            self.zmq_socket.send_string(f"unread messages: {self.short_name}: {new_messages}")
+            print(f"Sent notification regarding {self.short_name}")
 
     def idle_loop(self):
         self.server.idle()
@@ -64,8 +66,10 @@ class Checker:
                     self.server.idle()
                     self.last_sync = current_sync
             except (imapclient.exceptions.IMAPClientError, imapclient.exceptions.IMAPClientAbortError,
-                    socket.error, socket.timeout, ssl.SSLError, ssl.SSLEOFError, zmq.ZMQError):
+                    socket.error, socket.timeout, ssl.SSLError, ssl.SSLEOFError, zmq.ZMQError) as e:
+                print(f"Checker: Got exception: {e}")
                 self.zmq_socket.close()
+                self.server.logout()
                 self.connect()
                 self.idle_loop()
 
