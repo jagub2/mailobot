@@ -55,7 +55,8 @@ class Checker:
             try:
                 current_sync = datetime.datetime.now()
                 responses = self.server.idle_check(timeout=30)
-                if responses:
+                if responses and responses != [(b'OK', b'Still here')]:
+                    print(f"{self.short_name}: got responses: {responses}")
                     self.server.idle_done()
                     self.check_for_unread_messages()
                     self.server.noop()
@@ -67,9 +68,8 @@ class Checker:
                     self.last_sync = current_sync
             except (imapclient.exceptions.IMAPClientError, imapclient.exceptions.IMAPClientAbortError,
                     socket.error, socket.timeout, ssl.SSLError, ssl.SSLEOFError, zmq.ZMQError) as e:
-                print(f"Checker: Got exception: {e}")
+                print(f"Checker: Got exception @ {self.short_name}: {e}")
                 self.zmq_socket.close()
-                self.server.logout()
                 self.connect()
                 self.idle_loop()
 
