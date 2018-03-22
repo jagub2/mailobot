@@ -1,5 +1,6 @@
 # pylint: disable=C0111,C0301
 import datetime
+import imaplib
 import socket
 import ssl
 import threading
@@ -67,7 +68,8 @@ class Checker:
                     self.server.idle()
                     self.last_sync = current_sync
             except (imapclient.exceptions.IMAPClientError, imapclient.exceptions.IMAPClientAbortError,
-                    socket.error, socket.timeout, ssl.SSLError, ssl.SSLEOFError, zmq.ZMQError) as exception:
+                    imaplib.IMAP4.error, imaplib.IMAP4.abort, socket.error, socket.timeout, ssl.SSLError,
+                    ssl.SSLEOFError, zmq.ZMQError) as exception:
                 print(f"Checker: Got exception @ {self.short_name}: {exception}")
                 self.zmq_socket.close()
                 self.connect()
